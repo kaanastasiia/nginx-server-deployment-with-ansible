@@ -5,15 +5,19 @@
     - vars.yml
   tasks:
   - name: Update repository index
-    ansible.builtin.apt:
+    apt:
       update_cache: yes
+    tags: 
+    - update_cache
 
   - name: Install nginx
-    ansible.builtin.apt:
+    apt:
       name: nginx
+    tags:
+    - install_nginx
   
   - name: Change file ownership to www-data
-    ansible.builtin.file:
+    file:
       path: /var/www/html
       state: directory
       recurse: yes
@@ -21,10 +25,10 @@
       group: www-data
 
   - name: Rename index.nginx-debian.html to index.html
-    ansible.builtin.shell: mv /var/www/html/index.nginx-debian.html /var/www/html/index.html
+    shell: mv /var/www/html/index.nginx-debian.html /var/www/html/index.html
 
   - name: Create nginx.conf file
-    ansible.builtin.template:
+    template:
       src: ubuntu/nginx.conf.j2
       dest: /etc/nginx/nginx.conf
 
@@ -33,7 +37,7 @@
 
   handlers: 
     - name: Restart nginx
-      ansible.builtin.service:
+      service:
         name: nginx
         state: restarted
         enabled: true
@@ -45,16 +49,20 @@
     - vars.yml
   tasks:
   - name: Install epel repository
-    ansible.builtin.yum:
+    yum:
       name: epel-release
       state: present
+    tags:
+    - install_epel
 
   - name: Install nginx
-    ansible.builtin.yum:
+    yum:
       name: nginx
+    tags:
+    - install_nginx
 
   - name: Create nginx.conf file
-    ansible.builtin.template:
+    template:
       src: centos/nginx.conf.j2
       dest: /etc/nginx/nginx.conf
 
@@ -63,7 +71,7 @@
 
   handlers:
   - name: Start nginx
-    ansible.builtin.service:
+    service:
       name: nginx
-      state: restarted
+      state: started
       enabled: true
